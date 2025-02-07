@@ -1,14 +1,17 @@
 ﻿using API.Entites;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
 namespace API.Data
 {
-    public class Seed
+    public static class Seed
     {
-        public static async Task SeedUser(DataContext context)
+        public static async Task SeedUsers(DataContext context)
         {
+            if (await context.Users.AnyAsync()) return;
+
             var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
