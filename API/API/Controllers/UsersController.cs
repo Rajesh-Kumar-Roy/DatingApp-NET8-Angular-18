@@ -31,6 +31,8 @@ namespace API.Controllers
             return user;
         }
 
+
+
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
