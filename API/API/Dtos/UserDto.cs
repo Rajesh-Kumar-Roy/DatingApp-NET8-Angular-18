@@ -2,7 +2,8 @@
 {
     public class UserDto
     {
-        public required string  UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public required string KnownAs { get; set; }
         public required string Token { get; set; }
         public string? PhotoUrl { get; set; }
     }
