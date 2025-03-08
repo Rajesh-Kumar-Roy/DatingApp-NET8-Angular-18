@@ -15,29 +15,26 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './member-list.component.css'
 })
 export class MemberListComponent implements OnInit {
-  private accountService = inject(AccountService);
-  memberService= inject(MembersService);
-  userParams = new UserParams(this.accountService.currentUser());
-  genderList = [{value: 'male', display: 'Males'}, {value: 'female', display:'Females'}];
-
-
+ 
+  memberService = inject(MembersService);
+  genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}]
 
   ngOnInit(): void {
-   if(!this.memberService.paginatedResult()) this.loadMembers();
+    if (!this.memberService.paginatedResult()) this.loadMembers();
   }
 
   loadMembers() {
-    this.memberService.getMembers(this.userParams);
+    this.memberService.getMembers();
   }
 
-  resetFilters(){
-    this.userParams = new UserParams(this.accountService.currentUser());
+  resetFilters() {
+    this.memberService.resetUserParams();
     this.loadMembers();
   }
-  
-  pageChanged(event: any){
-    if(this.userParams.pageNumber!= event.page){
-      this.userParams.pageNumber = event.page;
+
+  pageChanged(event: any) {
+    if (this.memberService.userParams().pageNumber != event.page) {
+      this.memberService.userParams().pageNumber = event.page;
       this.loadMembers();
     }
   }

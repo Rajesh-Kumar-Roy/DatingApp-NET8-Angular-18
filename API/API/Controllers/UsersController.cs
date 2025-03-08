@@ -6,7 +6,6 @@ using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -19,15 +18,17 @@ namespace API.Controllers
         {
             userParams.CurrentUserName = User.GetUserName();
             var users = await userRepository.GetMembersAsync(userParams);
+
             Response.AddPaginationHeader(users);
-            
+
             return Ok(users);
         }
 
-        [HttpGet("{username}")] //api/users/2
+        [HttpGet("{username}")]  // /api/users/2
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
             var user = await userRepository.GetMemberAsync(username);
+
             if (user == null) return NotFound();
 
             return user;
@@ -36,12 +37,11 @@ namespace API.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
-            var user = await userRepository.GetUserByNameAsync(User.GetUserName());
+            var user = await userRepository.GetUserByUserNameAsync(User.GetUserName());
 
-            if (user == null) return BadRequest("Could not find user.");
+            if (user == null) return BadRequest("Could not find user");
 
             mapper.Map(memberUpdateDto, user);
-
 
             if (await userRepository.SaveAllAsync()) return NoContent();
 
@@ -51,9 +51,9 @@ namespace API.Controllers
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var user = await userRepository.GetUserByNameAsync(User.GetUserName());
+            var user = await userRepository.GetUserByUserNameAsync(User.GetUserName());
 
-            if (user == null) return BadRequest("Can not update user");
+            if (user == null) return BadRequest("Cannot update user");
 
             var result = await photoService.AddPhotoAsync(file);
 
@@ -73,23 +73,22 @@ namespace API.Controllers
                 return CreatedAtAction(nameof(GetUser),
                     new { username = user.UserName }, mapper.Map<PhotoDto>(photo));
 
-
-            return BadRequest("Problem adding photo.");
+            return BadRequest("Problem adding photo");
         }
 
         [HttpPut("set-main-photo/{photoId:int}")]
         public async Task<ActionResult> SetMainPhoto(int photoId)
         {
-            var user = await userRepository.GetUserByNameAsync(User.GetUserName());
+            var user = await userRepository.GetUserByUserNameAsync(User.GetUserName());
 
             if (user == null) return BadRequest("Could not find user");
 
-            var photo = user.Photos.FirstOrDefault(x=>x.Id == photoId);
+            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if (photo == null) return BadRequest("Cannot use this as main photo");
+            if (photo == null || photo.IsMain) return BadRequest("Cannot use this as main photo");
 
             var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
-            if(currentMain != null) currentMain.IsMain = false;
+            if (currentMain != null) currentMain.IsMain = false;
             photo.IsMain = true;
 
             if (await userRepository.SaveAllAsync()) return NoContent();
@@ -100,13 +99,13 @@ namespace API.Controllers
         [HttpDelete("delete-photo/{photoId:int}")]
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
-            var user = await userRepository.GetUserByNameAsync(User.GetUserName());
+            var user = await userRepository.GetUserByUserNameAsync(User.GetUserName());
 
             if (user == null) return BadRequest("User not found");
 
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if (photo == null || photo.IsMain) return BadRequest("This photo can not be deleted");
+            if (photo == null || photo.IsMain) return BadRequest("This photo cannot be deleted");
 
             if (photo.PublicId != null)
             {

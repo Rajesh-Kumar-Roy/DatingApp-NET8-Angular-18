@@ -33,6 +33,12 @@ namespace API.Data
 
             query = query.Where(x => x.DateOfBirth >= minDob && x.DateOfBirth <= maxDob);
 
+            query = userParams.OrderBy switch
+            {
+                "created" => query.OrderByDescending(x => x.Created),
+                _ => query.OrderByDescending(x => x.LastActive)
+            };
+
             return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(mapper.ConfigurationProvider), userParams.PageNumber, userParams.PageSize);
         }
 
@@ -41,7 +47,7 @@ namespace API.Data
             return await context.Users.FindAsync(id);
         }
 
-        public async Task<AppUser?> GetUserByNameAsync(string name)
+        public async Task<AppUser?> GetUserByUserNameAsync(string name)
         {
             return await context.Users
                 .Where(x => x.UserName == name)
