@@ -14,30 +14,35 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
   styleUrl: './lists.component.css'
 })
 export class ListsComponent implements OnInit{
-  private likesService = inject(LikesService);
-  members: Member[] = [];
+  likesService = inject(LikesService);
   predicate = 'liked';
+  pageNumber = 1;
+  pageSize = 5;
 
   ngOnInit(): void {
-    this.loadLikes();
+    this.loadLikes(); 
   }
 
-  getTitle(){
-    switch(this.predicate){
+  getTitle() {
+    switch (this.predicate) {
       case 'liked': return 'Members you like';
       case 'likedBy': return 'Members who like you';
-      default: return 'Mutual';
+      default: return 'Mutual'
     }
   }
 
   loadLikes() {
-    this.likesService.getLikes(this.predicate).subscribe({
-      next: (members) => {
-        this.members = members;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
+    this.likesService.getLikes(this.predicate, this.pageNumber, this.pageSize);
+  }
+
+  pageChanged(event: any) {
+    if (this.pageNumber !== event.page) {
+      this.pageNumber = event.page;
+      this.loadLikes();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.likesService.paginatedResult.set(null);
   }
 }
