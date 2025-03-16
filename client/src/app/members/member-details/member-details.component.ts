@@ -28,7 +28,21 @@ export class MemberDetailsComponent implements OnInit {
   messages: Message[] = [];
 
   ngOnInit(): void {
-    this.loadMember();
+    this.route.data.subscribe({
+      next: data =>{
+        this.member = data['member'];
+        this.member && this.member.photos.map(p=>{
+          this.images.push(new ImageItem({src: p.url, thumb: p.url}));
+        })
+      }
+    })
+
+
+    this.route.queryParams.subscribe( {
+      next: params =>{
+        params['tab'] && this.selectTab(params['tab']);
+      }
+    });
   }
 
   onUpdateMessages(event: Message) {
@@ -51,16 +65,16 @@ export class MemberDetailsComponent implements OnInit {
     }
   }
 
-  loadMember(){
-    const username = this.route.snapshot.paramMap.get('username');
-    if(!username) return;
-    this.memberService.getMember(username).subscribe({
-      next: member => {
-        this.member = member;
-        member.photos.map(p=>{
-          this.images.push(new ImageItem({src: p.url, thumb: p.url}));
-        })
-      }
-    });
-  }
+  // loadMember(){
+  //   const username = this.route.snapshot.paramMap.get('username');
+  //   if(!username) return;
+  //   this.memberService.getMember(username).subscribe({
+  //     next: member => {
+  //       this.member = member;
+  //       member.photos.map(p=>{
+  //         this.images.push(new ImageItem({src: p.url, thumb: p.url}));
+  //       })
+  //     }
+  //   });
+  // }
 }

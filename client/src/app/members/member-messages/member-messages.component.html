@@ -36,12 +36,12 @@
     </div>
 
     <div class="card-footer">
-        <form #messageForm="ngForm">
+        <form #messageForm="ngForm" (ngSubmit)="sendMessage()">
             <div class="input-group">
                 <input 
                     name="messageContent"
                     required
-                   
+                   [(ngModel)]="messageContent"
                     type="text" 
                     class="form-control input-sm" 
                     placeholder="Send a private message">
