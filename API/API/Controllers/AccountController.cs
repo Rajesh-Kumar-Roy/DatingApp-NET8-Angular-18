@@ -21,11 +21,6 @@ public class AccountController(DataContext context, ITokenService tokenService, 
         using var hmac = new HMACSHA512();
 
         var user = mapper.Map<AppUser>(registerDto);
-
-        user.UserName = registerDto.Username.ToLower();
-        user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
-        user.PasswordSalt = hmac.Key;
-
         context.Users.Add(user);
         await context.SaveChangesAsync();
 
@@ -43,19 +38,10 @@ public class AccountController(DataContext context, ITokenService tokenService, 
     {
         var user = await context.Users
             .Include(c=>c.Photos)
-            .FirstOrDefaultAsync(c=>c.UserName.ToLower() == loginDto.UserName.ToLower());
+            .FirstOrDefaultAsync(c=>c.NormalizedUserName == loginDto.UserName.ToUpper());
 
-        if (user == null) return Unauthorized("Invalid userName");
+        if (user == null || user.UserName == null) return Unauthorized("Invalid userName");
 
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-
-        var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-        for(int i = 0; i < computeHash.Length; i++)
-        {
-            if (computeHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Password");
-
-        }
         return new UserDto
         {
             UserName = loginDto.UserName,
@@ -68,7 +54,7 @@ public class AccountController(DataContext context, ITokenService tokenService, 
 
     private async Task<bool> UserExists(string userName)
     {
-        return await context.Users.AnyAsync(c => c.UserName.ToLower() == userName.ToLower());
+        return await context.Users.AnyAsync(c => c.NormalizedUserName == userName.ToUpper());
     }
 }
 
