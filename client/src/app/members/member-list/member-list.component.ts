@@ -5,12 +5,12 @@ import { MemberCardComponent } from '../member-card/member-card.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { UserParams } from '../../_models/userParams';
 import { AccountService } from '../../_services/account.service';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-member-list',
   standalone: true,
-  imports: [MemberCardComponent,PaginationModule,FormsModule],
+  imports: [MemberCardComponent,PaginationModule,FormsModule,ReactiveFormsModule],
   templateUrl: './member-list.component.html',
   styleUrl: './member-list.component.css'
 })
