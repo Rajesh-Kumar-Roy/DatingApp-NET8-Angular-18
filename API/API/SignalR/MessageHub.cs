@@ -1,5 +1,4 @@
-﻿using API.Data;
-using API.Dtos;
+﻿using API.Dtos;
 using API.Entites;
 using API.Extensions;
 using API.Interfaces;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace API.SignalR
 {
-    public class MessageHub(IMessageRepository messageRepository, IUserRepository userRepository, IMapper mapper): Hub
+    public class MessageHub(IMessageRepository messageRepository, IUserRepository userRepository, IMapper mapper) : Hub
     {
         public override async Task OnConnectedAsync()
         {
@@ -39,7 +38,7 @@ namespace API.SignalR
             var sender = await userRepository.GetUserByUserNameAsync(username);
             var recipient = await userRepository.GetUserByUserNameAsync(createMessageDto.RecipientUsername);
 
-            if (recipient == null || sender == null || recipient.UserName == null || sender.UserName == null) 
+            if (recipient == null || sender == null || recipient.UserName == null || sender.UserName == null)
                 throw new HubException("Cannot send message at this time");
 
             var message = new Message
