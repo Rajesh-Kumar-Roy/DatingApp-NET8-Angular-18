@@ -59,6 +59,11 @@
                     connectionIds = connection.ToList();
                 }
             }
+            else
+            {
+                connectionIds = [];
+            }
+            return Task.FromResult(connectionIds);
         }
     }
 }
