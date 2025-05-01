@@ -47,5 +47,18 @@
 
             return Task.FromResult(onlineUsers);
         }
+
+        public static Task<List<string>> GetConnectionsForUser(string userName)
+        {
+            List<string> connectionIds;
+
+            if(OnlineUsers.TryGetValue(userName, out var connection))
+            {
+                lock (connection)
+                {
+                    connectionIds = connection.ToList();
+                }
+            }
+        }
     }
 }
