@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 /API/API/appsettings.Development.json
 /API/API/appsettings.json
 /API/API/dating.db-shm
+/API/API/wwwroot
