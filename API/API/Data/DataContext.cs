@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Data;
 public class DataContext(DbContextOptions options) : IdentityDbContext<AppUser, AppRole,int,IdentityUserClaim<int>, AppUserRole,IdentityUserLogin<int>,IdentityRoleClaim<int>,IdentityUserToken<int>>(options)
 {
-    
+    // connection string for docker:  "Server=localhost,1433; Database=DatingAppDb; User Id=SA; Password = Password@1; TrustServerCertificate=True;"
     public DbSet<UserLike> Likes { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Group> Groups { get; set; }
