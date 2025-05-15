@@ -3,11 +3,10 @@ import { Component, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-test-error',
-  standalone: true,
-  imports: [],
-  templateUrl: './test-error.component.html',
-  styleUrl: './test-error.component.css'
+    selector: 'app-test-error',
+    imports: [],
+    templateUrl: './test-error.component.html',
+    styleUrl: './test-error.component.css'
 })
 export class TestErrorComponent {
   baseUrl = environment.apiUrl;

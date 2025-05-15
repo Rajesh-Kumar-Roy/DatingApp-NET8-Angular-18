@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from "./nav/nav.component";
@@ -8,11 +7,10 @@ import { HomeComponent } from "./home/home.component";
 import { NgxSpinnerComponent } from 'ngx-spinner';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [ NavComponent,RouterOutlet, NgxSpinnerComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    imports: [NavComponent, RouterOutlet, NgxSpinnerComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   title = 'Dating App';

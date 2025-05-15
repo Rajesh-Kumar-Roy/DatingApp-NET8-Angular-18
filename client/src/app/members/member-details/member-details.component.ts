@@ -14,11 +14,10 @@ import { AccountService } from '../../_services/account.service';
 import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 
 @Component({
-  selector: 'app-member-details',
-  standalone: true,
-  imports: [TabsModule, GalleryModule, TimeagoModule, DatePipe, MemberMessagesComponent],
-  templateUrl: './member-details.component.html',
-  styleUrl: './member-details.component.css'
+    selector: 'app-member-details',
+    imports: [TabsModule, GalleryModule, TimeagoModule, DatePipe, MemberMessagesComponent],
+    templateUrl: './member-details.component.html',
+    styleUrl: './member-details.component.css'
 })
 export class MemberDetailsComponent implements OnInit, OnDestroy {
   @ViewChild('memberTabs', {static: true}) memberTabs?: TabsetComponent;

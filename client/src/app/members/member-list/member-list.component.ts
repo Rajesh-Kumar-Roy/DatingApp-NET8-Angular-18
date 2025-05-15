@@ -7,11 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 
 @Component({
-  selector: 'app-member-list',
-  standalone: true,
-  imports: [MemberCardComponent, PaginationModule, FormsModule, ButtonsModule],
-  templateUrl: './member-list.component.html',
-  styleUrl: './member-list.component.css'
+    selector: 'app-member-list',
+    imports: [MemberCardComponent, PaginationModule, FormsModule, ButtonsModule],
+    templateUrl: './member-list.component.html',
+    styleUrl: './member-list.component.css'
 })
 export class MemberListComponent implements OnInit {
  

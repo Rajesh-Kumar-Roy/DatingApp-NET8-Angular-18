@@ -6,11 +6,10 @@ import { AdminService } from '../../_services/admin.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-user-management',
-  standalone: true,
-  imports: [],
-  templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.css'
+    selector: 'app-user-management',
+    imports: [],
+    templateUrl: './user-management.component.html',
+    styleUrl: './user-management.component.css'
 })
 export class UserManagementComponent implements OnInit {
   private adminService = inject(AdminService);

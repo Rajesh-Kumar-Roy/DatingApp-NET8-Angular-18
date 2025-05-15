@@ -8,11 +8,10 @@ import { TimeagoModule } from 'ngx-timeago';
 import { Message } from '../../_models/message';
 
 @Component({
-  selector: 'app-messages',
-  standalone: true,
-  imports: [ButtonsModule, FormsModule, TimeagoModule, RouterLink, PaginationModule],
-  templateUrl: './messages.component.html',
-  styleUrl: './messages.component.css'
+    selector: 'app-messages',
+    imports: [ButtonsModule, FormsModule, TimeagoModule, RouterLink, PaginationModule],
+    templateUrl: './messages.component.html',
+    styleUrl: './messages.component.css'
 })
 export class MessagesComponent implements OnInit {
   messageService = inject(MessageService);

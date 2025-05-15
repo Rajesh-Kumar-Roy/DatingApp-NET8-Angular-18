@@ -4,11 +4,10 @@ import { Photo } from '../../_models/photo';
 import { NgFor } from '@angular/common';
 
 @Component({
-  selector: 'app-photo-management',
-  standalone: true,
-  imports: [NgFor],
-  templateUrl: './photo-management.component.html',
-  styleUrl: './photo-management.component.css'
+    selector: 'app-photo-management',
+    imports: [NgFor],
+    templateUrl: './photo-management.component.html',
+    styleUrl: './photo-management.component.css'
 })
 export class PhotoManagementComponent implements OnInit {
   photos: Photo[] = [];

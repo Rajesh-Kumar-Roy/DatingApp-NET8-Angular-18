@@ -4,11 +4,10 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { TimeagoModule } from 'ngx-timeago';
 
 @Component({
-  selector: 'app-member-messages',
-  standalone: true,
-  imports: [TimeagoModule, FormsModule],
-  templateUrl: './member-messages.component.html',
-  styleUrl: './member-messages.component.css'
+    selector: 'app-member-messages',
+    imports: [TimeagoModule, FormsModule],
+    templateUrl: './member-messages.component.html',
+    styleUrl: './member-messages.component.css'
 })
 export class MemberMessagesComponent  implements AfterViewChecked {
   @ViewChild('messageForm') messageForm?: NgForm;

@@ -2,16 +2,14 @@ import { Component, inject, output, } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { Router } from '@angular/router';
-import { NgIf } from '@angular/common';
 import { TextInputComponent } from '../_froms/text-input/text-input.component';
 import { DatePickerComponent } from '../_forms/date-picker/date-picker.component';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [ReactiveFormsModule, NgIf,TextInputComponent,DatePickerComponent],
-  templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+    selector: 'app-register',
+    imports: [ReactiveFormsModule, TextInputComponent, DatePickerComponent],
+    templateUrl: './register.component.html',
+    styleUrl: './register.component.css'
 })
 export class RegisterComponent {
   private accountService = inject(AccountService);
