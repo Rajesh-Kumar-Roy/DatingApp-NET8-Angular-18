@@ -53,7 +53,7 @@ export class PhotoEditorComponent  implements OnInit{
         const upadtedMember = {...this.member()};
         upadtedMember.photoUrl = photo.url;
         upadtedMember.photos.forEach(p=>{
-          if(p.isMain) p.isMain = true;
+          if(p.isMain) p.isMain = false;
           if(p.id === photo.id) p.isMain = true;
         });
         this.memberChange.emit(upadtedMember);
