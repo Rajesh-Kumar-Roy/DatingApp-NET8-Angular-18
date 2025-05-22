@@ -12,7 +12,7 @@ using System.Text;
 namespace API.Controllers;
 
 
-public class AccountController(UserManager<AppUser> userManger, ITokenService tokenService, IMapper mapper) : BaseApiController
+public class AccountController(UserManager<AppUser> userManager, ITokenService tokenService, IMapper mapper) : BaseApiController
 {
     [HttpPost("register")]  //account/register
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
@@ -22,30 +22,48 @@ public class AccountController(UserManager<AppUser> userManger, ITokenService to
         var user = mapper.Map<AppUser>(registerDto);
         user.UserName = registerDto.Username.ToLower();
 
-        var result = await userManger.CreateAsync(user, registerDto.Password);
+        var resfreshToken = tokenService.GenerateRefreshToken();
+        var expiresTime = DateTime.UtcNow.AddDays(1);
+
+        user.RefreshExpiriesTime = expiresTime;
+        user.RefreshToken = resfreshToken;
+
+        var result = await userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded) return BadRequest(result.Errors);
+      
         return new UserDto
         {
-            UserName = user.UserName,
+            UserName = registerDto.Username,
             KnownAs = user.KnownAs,
+            Gender = user.Gender,
             Token = await tokenService.CreateToken(user),
-            Gender = user.Gender
+            RefreshToken = resfreshToken,
+            RefreshExpiriesTime = expiresTime,
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await userManger.Users
+        var user = await userManager.Users
             .Include(c=>c.Photos)
             .FirstOrDefaultAsync(c=>c.NormalizedUserName == loginDto.UserName.ToUpper());
 
         if (user == null || user.UserName == null) return Unauthorized("Invalid userName");
 
-        var result = await userManger.CheckPasswordAsync(user, loginDto.Password);
+        var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
 
         if (!result) return Unauthorized();
+        var resfreshToken = tokenService.GenerateRefreshToken();
+        var expiresTime = DateTime.UtcNow.AddDays(1);
+        
+        user.RefreshExpiriesTime = expiresTime;
+        user.RefreshToken = resfreshToken;
+
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded) return StatusCode(500, "Failed to update refresh token");
 
         return new UserDto
         {
@@ -53,13 +71,15 @@ public class AccountController(UserManager<AppUser> userManger, ITokenService to
             KnownAs = user.KnownAs,
             Gender = user.Gender,
             Token = await tokenService.CreateToken(user),
+            RefreshToken = resfreshToken,
+            RefreshExpiriesTime = expiresTime,
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
 
     private async Task<bool> UserExists(string userName)
     {
-        return await userManger.Users.AnyAsync(c => c.NormalizedUserName == userName.ToUpper());
+        return await userManager.Users.AnyAsync(c => c.NormalizedUserName == userName.ToUpper());
     }
 }
 

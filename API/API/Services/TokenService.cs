@@ -5,6 +5,7 @@ using System.Text;
 using API.Entites;
 using API.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
@@ -42,20 +43,20 @@ namespace API.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<IEnumerable<Claim>> GetClaims(AppUser user)
-        {
-            var roles = await userManger.GetRolesAsync(user);
-            var cliams = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
+        //public async Task<IEnumerable<Claim>> GetClaims(AppUser user)
+        //{
+        //    var roles = await userManger.GetRolesAsync(user);
+        //    var cliams = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Name, user.UserName),
 
-            };
-            foreach (var role in roles)
-            {
-                cliams.Add(new Claim(ClaimTypes.Role, role));
-            }
-            return cliams;
-        }
+        //    };
+        //    foreach (var role in roles)
+        //    {
+        //        cliams.Add(new Claim(ClaimTypes.Role, role));
+        //    }
+        //    return cliams;
+        //}
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -69,12 +70,13 @@ namespace API.Services
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
+            var t = config.GetSection("TokenSetting") ?? throw new Exception("Token Key not found!");
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false, // you might want to validate the audience and issuer depending on your use case
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("JwtSecret").Value)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(t.GetSection("JwtSecret").Value)),
                 ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
 
             };
