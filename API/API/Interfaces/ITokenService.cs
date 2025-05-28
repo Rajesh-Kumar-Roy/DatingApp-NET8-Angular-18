@@ -1,4 +1,5 @@
-﻿using API.Entites;
+﻿using System.Security.Claims;
+using API.Entites;
 
 namespace API.Interfaces
 {
@@ -6,5 +7,6 @@ namespace API.Interfaces
     {
         Task<string> CreateToken(AppUser user);
         string GenerateRefreshToken();
+        Task<ClaimsPrincipal> GetPrincipalFromExpiredTokenAsync(string token);
     }
 }

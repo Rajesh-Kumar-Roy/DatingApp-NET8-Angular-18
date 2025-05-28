@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { User } from '../_models/user';
-import { map } from 'rxjs';
+import { map, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LikesService } from './likes.service';
 import { PresenceService } from './presence.service';
@@ -56,5 +56,23 @@ export class AccountService {
     localStorage.removeItem('user');
     this.currentUser.set(null);
     this.presenceService.stopHubConnection();
+  }
+
+  refreshToken(){
+    const refreshToken = this.currentUser()?.refreshToken;
+    const expiry = new Date(this.currentUser()?.refreshExpiriesTime || '');
+
+    if(!refreshToken || new Date() > expiry){
+      this.logout();
+      return throwError(() => new Error('Refresh token expired'));
+    }
+
+     return this.http.post<User>(this.baseUrl + 'account/refresh', {refreshToken: refreshToken, accessToken: this.currentUser()?.token }).pipe(
+      map(user =>{
+        if(user){
+          this.setCurrentUser(user);
+        }
+      })
+    );
   }
 }

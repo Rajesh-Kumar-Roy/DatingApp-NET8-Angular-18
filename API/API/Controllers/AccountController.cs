@@ -3,6 +3,7 @@ using API.Dtos;
 using API.Entites;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +77,56 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<ActionResult<UserDto>> Refresh([FromBody] TokenApiDto tokenApiModel)
+    {
+        if (tokenApiModel is null)
+            return BadRequest("Invalid client request");
+
+        var principal = await tokenService.GetPrincipalFromExpiredTokenAsync(tokenApiModel.AccessToken);
+        if (principal == null)
+            return Unauthorized("Invalid access token");
+
+        var userName =  principal.Identity?.Name;
+        if (string.IsNullOrEmpty(userName))
+            return Unauthorized();
+
+        //var user = await userManager.FindByNameAsync(userName);
+        //if (user == null)
+        //    return Unauthorized();
+
+        var userDetails =  await userManager.Users
+            .Include(c => c.Photos)
+            .FirstOrDefaultAsync(c => c.NormalizedUserName == userName.ToUpper());
+
+        if (userDetails == null || userDetails.RefreshToken != tokenApiModel.RefreshToken || userDetails.RefreshExpiriesTime <= DateTime.UtcNow)
+            return Unauthorized("Invalid refresh token");
+
+        // Rotate refresh token
+        var newRefreshToken = tokenService.GenerateRefreshToken();
+        userDetails.RefreshToken = newRefreshToken;
+        var expiresTime = DateTime.UtcNow.AddDays(1);
+        userDetails.RefreshExpiriesTime = expiresTime;
+
+        var updateResult = await userManager.UpdateAsync(userDetails);
+
+
+        if (!updateResult.Succeeded) return StatusCode(500, "Failed to update refresh token");
+
+        return new UserDto
+        {
+            UserName = userDetails.UserName!,
+            KnownAs = userDetails.KnownAs!,
+            Gender = userDetails.Gender!,
+            Token = await tokenService.CreateToken(userDetails),
+            RefreshToken = newRefreshToken,
+            RefreshExpiriesTime = expiresTime,
+            PhotoUrl = userDetails.Photos.FirstOrDefault(x => x.IsMain)?.Url
+        };
+    }
+
 
     private async Task<bool> UserExists(string userName)
     {

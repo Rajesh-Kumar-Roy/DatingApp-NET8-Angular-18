@@ -5,4 +5,6 @@ export interface User{
     token: string; 
     photoUrl?: string;
     roles: string[];
+    refreshExpiriesTime: Date;
+    refreshToken: string;
 }

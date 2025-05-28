@@ -5,7 +5,6 @@ using System.Text;
 using API.Entites;
 using API.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
@@ -68,28 +67,41 @@ namespace API.Services
 
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        public async Task<ClaimsPrincipal> GetPrincipalFromExpiredTokenAsync(string token)
         {
-            var t = config.GetSection("TokenSetting") ?? throw new Exception("Token Key not found!");
+            var tokenKey = config["TokenKey"] ?? throw new Exception("TokenKey is missing");
+            if (tokenKey.Length < 64) throw new Exception("TokenKey must be at least 64 characters");
+
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false, // you might want to validate the audience and issuer depending on your use case
+                ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(t.GetSection("JwtSecret").Value)),
-                ValidateLifetime = false // here we are saying that we don't care about the token's expiration date
-
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
+                ValidateLifetime = false // Allows extracting claims from expired tokens
             };
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Token Invalid");
 
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+                var jwtSecurityToken = securityToken as JwtSecurityToken;
 
-            return principal;
+                if (jwtSecurityToken == null ||
+                    !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new SecurityTokenException("Invalid token algorithm");
+                }
+
+                return principal;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityTokenException("Token validation failed", ex);
+            }
         }
+
+
     }
 }
